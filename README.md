@@ -92,3 +92,4 @@ This lab environment was created to:
 - LDAP  
 - Mail Server  
 - SSH
+- Ftp
