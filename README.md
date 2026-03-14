@@ -31,61 +31,40 @@ Inside the virtual environment, Proxmox VE provides nested virtualization to hos
 
 The environment contains two main networks:
 
-- **LAN Network** – internal communication between servers
-- **Management Network** – administrative access via jump host (CL01)
+- **LAN Network** – internal communication between servers  
+- **Management Network** – administrative access via jump host (CL01)  
 
 The management network allows SSH access to all servers through the jump host.
 
 ---
 
-## Server Roles
+## Components / Infrastructure
 
-| Server | Services |
-|------|------|
+| Component | Description | IP Address |
+|-----------|------------|------------|
+| Router | Provides routing between internal and external networks | 192.168.10.1 |
+| CL01 – Jump Host | Admin access to internal servers | 192.168.10.50 |
+| Srv1 | DNS, DHCP, LDAP | 192.168.10.11 |
+| Srv2 | Web Server, Nextcloud, Docker containers, FTP, Backup | 192.168.10.13 |
+| Srv3 | Mail Server | 192.168.10.14 |
+| Zabbix | Monitoring system | 192.168.10.15 |
+| Storage | Shared storage for services and backups | 192.168.10.12 |
+| Proxmox VE | Nested virtualization platform | 192.168.10.10 |
+
+---
+
+## Server Roles & Services
+
+| Server | Roles / Services |
+|--------|-----------------|
 | **Srv1** | DNS, DHCP, LDAP |
-| **Srv2** | Web Server, Nextcloud, Backup, Docker Containers，FTP |
+| **Srv2** | Web Server, Nextcloud, Docker container environment, FTP, Backup |
 | **Srv3** | Mail Server |
-
----
-
-## Infrastructure Components
-
-### Router
-Provides routing between the internal network and the external network.
-
-### CL01 – Jump Host
-Used for administrative access to internal servers through the management network.
-
-### Zabbix
-Monitoring system used to observe system health and service availability.
-
-### Storage
-Provides storage resources for services and backups.
-
-### Proxmox VE
-Used as a nested virtualization platform to host additional Linux servers.
-
----
-
-## Implemented Services
-
-**Network Services**
-
-- DNS
-- DHCP
-- LDAP
-
-**Application Services**
-
-- Web Server
-- Nextcloud
-- Mail Server
-
-**Infrastructure Services**
-
-- Backup system
-- Docker container environment
-- Monitoring with Zabbix
+| **CL01** | Jump Host for administrative access |
+| **Zabbix** | Monitoring system for servers and services |
+| **Storage** | Provides storage for services and backups |
+| **Router** | Routing between internal and external networks |
+| **Proxmox VE** | Nested virtualization platform hosting additional Linux servers |
 
 ---
 
@@ -93,26 +72,23 @@ Used as a nested virtualization platform to host additional Linux servers.
 
 This lab environment was created to:
 
-- practice Linux system administration
-- deploy and configure typical enterprise services
-- understand network architecture and service dependencies
-- experiment with virtualization and containerization
-- simulate a small enterprise IT infrastructure
+- Practice Linux system administration  
+- Deploy and configure typical enterprise services  
+- Understand network architecture and service dependencies  
+- Experiment with virtualization and containerization  
+- Simulate a small enterprise IT infrastructure
 
 ---
 
 ## Technologies Used
 
-- Linux
-- Proxmox VE
-- Hyper-V
-- Docker
-- Zabbix
-- Nextcloud
-- DNS / DHCP
-- LDAP
-- Mail Server
-
----
-
-## Repository Structure
+- Linux  
+- Proxmox VE  
+- Hyper-V  
+- Docker  
+- Zabbix  
+- Nextcloud  
+- DNS / DHCP  
+- LDAP  
+- Mail Server  
+- SSH
