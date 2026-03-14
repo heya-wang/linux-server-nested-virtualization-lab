@@ -23,7 +23,7 @@ Key technologies include:
 The lab environment runs on a physical host using Hyper-V.  
 Inside the virtual environment, Proxmox VE provides nested virtualization to host multiple Linux servers and infrastructure services.
 
-![Architecture Overview](diagrams/infrastructure-topology.png)
+![Architecture Overview](diagrams/infrastructure_topology.png)
 
 ---
 
