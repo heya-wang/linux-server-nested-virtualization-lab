@@ -90,7 +90,6 @@ systemctl enable bind9
 
 # Set local DNS
 echo "nameserver 127.0.0.1" > /etc/resolv.conf
-chattr +i /etc/resolv.conf
 
 # Test DNS
 dig proxmox.gfn.internal @192.168.10.11
