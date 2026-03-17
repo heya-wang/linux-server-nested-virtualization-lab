@@ -187,4 +187,68 @@ systemctl enable kea-dhcp4-server
 ```
 
 ---
+# SSH Pubkey Authentication (SRV1 ↔ CL01)
+
+---
+
+## SSH Server (SRV1)
+
+```bash
+# Install OpenSSH server 
+sudo apt install -y openssh-server
+
+# Edit SSH server configuration
+sudo nano /etc/ssh/sshd_config
+
+# Ensure the following options are enabled:
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# Reload SSH service to apply changes
+sudo systemctl reload sshd
+```
+
+---
+
+## SSH Client (CL01)
+
+```bash
+# Generate SSH key pair (RSA 4096)
+ssh-keygen -t rsa -b 4096
+
+# Copy public key to server
+ssh-copy-id -i ~/.ssh/id_rsa.pub student@192.168.10.11
+
+# Test SSH login
+ssh student@192.168.10.11
+```
+
+```bash
+# Keys are stored in:
+~/.ssh/id_rsa      # Private key
+~/.ssh/id_rsa.pub  # Public key
+```
+
+---
+
+## Disable Password Authentication (Server Hardening)
+
+```bash
+# Edit SSH configuration
+sudo nano /etc/ssh/sshd_config
+
+# Change this setting:
+PasswordAuthentication no
+
+# Reload SSH service
+sudo systemctl reload sshd
+```
+
+```bash
+
+```
+
+---
+
+
 
