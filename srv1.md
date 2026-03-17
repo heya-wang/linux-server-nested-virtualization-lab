@@ -1,8 +1,8 @@
 # SRV1 Configuration (Debian 13)
 
-> Hostname: srv1
-> IP: 192.168.10.11/24
-> Gateway: 192.168.10.1
+> Hostname: srv1<br>
+> IP: 192.168.10.11/24<br>
+> Gateway: 192.168.10.1<br>
 > Domain: gfn.internal
 
 ---
@@ -156,7 +156,7 @@ cat > /etc/kea/kea-dhcp4.conf << 'EOF'
                 # IP pool
                 "pools": [
                     {
-                        "pool": "192.168.10.100 - 192.168.10.200"
+                        "pool": "192.168.10.50 - 192.168.10.200"
                     }
                 ],
 
@@ -188,14 +188,3 @@ systemctl enable kea-dhcp4-server
 
 ---
 
-## Client Test
-
-```bash
-# Run on client (CL01)
-
-# Request IP from DHCP
-sudo dhclient -v
-
-# Verify assigned address
-ip addr show
-```
