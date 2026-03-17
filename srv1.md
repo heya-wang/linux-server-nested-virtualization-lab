@@ -33,6 +33,18 @@ cat > /etc/bind/named.conf.options << 'EOF'
 acl internal-network {
     192.168.10.0/24;
 };
+options {
+    directory "/var/cache/bind";
+    forwarders {
+        1.1.1.1;
+        8.8.8.8;
+    };
+    allow-query { localhost; internal-network; };
+    allow-transfer { none; };
+    recursion yes;
+    dnssec-validation no;
+    listen-on-v6 { none; };
+};
 EOF
 
 # Configure internal zones
@@ -53,9 +65,9 @@ $TTL 604800
 @ IN SOA srv1.gfn.internal. admin.gfn.internal. (1 604800 86400 2419200 604800)
 @ IN NS srv1.gfn.internal.
 srv1    IN A 192.168.10.11
-proxmox IN A 192.168.10.12
+proxmox IN A 192.168.10.10
 router  IN A 192.168.10.1
-CL01    IN A 192.168.10.21
+CL01    IN A 192.168.10.50
 EOF
 
 # Configure reverse zone
@@ -64,13 +76,13 @@ $TTL 604800
 @ IN SOA srv1.gfn.internal. admin.gfn.internal. (1 604800 86400 2419200 604800)
 @ IN NS srv1.gfn.internal.
 11 IN PTR srv1.gfn.internal.
-12 IN PTR proxmox.gfn.internal.
+10 IN PTR proxmox.gfn.internal.
 1  IN PTR router.gfn.internal.
-21 IN PTR CL01.gfn.internal.
+50 IN PTR CL01.gfn.internal.
 EOF
 
 # Disable IPv6 for bind
-sed -i 's/^OPTIONS=.*/OPTIONS="-4"/' /etc/default/bind9
+sed -i 's/^OPTIONS=.*/OPTIONS="-4"/' /etc/default/named
 
 # Restart and enable
 systemctl restart bind9
