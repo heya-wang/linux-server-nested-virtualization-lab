@@ -94,3 +94,72 @@ echo "nameserver 127.0.0.1" > /etc/resolv.conf
 # Test DNS
 dig proxmox.gfn.internal @192.168.10.11
 ```
+# SRV1 - DHCP Server Configuration
+
+## Complete Setup
+
+\`\`\`bash
+# Install KEA DHCP Server
+apt update && apt install -y kea
+
+# Backup default configuration
+mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.example
+
+# Configure KEA DHCP
+cat > /etc/kea/kea-dhcp4.conf << 'EOF'
+{
+    "Dhcp4": {
+        "interfaces-config": {
+            "interfaces": [ "ens18" ]
+        },
+        "control-socket": {
+            "socket-type": "unix",
+            "socket-name": "/run/kea/kea4-ctrl-socket"
+        },
+        "lease-database": {
+            "type": "memfile",
+            "lfc-interval": 3600
+        },
+        "valid-lifetime": 600,
+        "max-valid-lifetime": 7200,
+        "subnet4": [
+            {
+                "id": 1,
+                "subnet": "192.168.10.0/24",
+                "pools": [
+                    {
+                        "pool": "192.168.10.100 - 192.168.10.200"
+                    }
+                ],
+                "option-data": [
+                    {
+                        "name": "routers",
+                        "data": "192.168.10.1"
+                    },
+                    {
+                        "name": "domain-name-servers",
+                        "data": "192.168.10.11"
+                    },
+                    {
+                        "name": "domain-name",
+                        "data": "gfn.internal"
+                    }
+                ]
+            }
+        ]
+    }
+}
+EOF
+
+# Restart and enable DHCP server
+systemctl restart kea-dhcp4-server
+systemctl enable kea-dhcp4-server
+systemctl status kea-dhcp4-server --no-pager
+\`\`\`
+
+## Test DHCP Client (on CL01)
+\`\`\`bash
+# On CL01, switch to DHCP
+sudo dhclient -v
+ip addr show
+\`\`\`
