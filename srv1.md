@@ -1,19 +1,16 @@
-# SRV1 - DNS Server Configuration
+# SRV1 Configuration (Debian 13)
 
-## Virtual Machine Settings
-- **Hostname:** srv1
-- **OS:** Debian 13
-- **IP:** 192.168.10.11/24
-- **Gateway:** 192.168.10.1
-- **DNS:** 127.0.0.1
-- **Domain:** gfn.internal
+> Hostname: srv1
+> IP: 192.168.10.11/24
+> Gateway: 192.168.10.1
+> Domain: gfn.internal
 
 ---
 
-## Complete Setup
+## Network
 
 ```bash
-# Network Configuration
+# Configure static network interface
 cat > /etc/network/interfaces << 'EOF'
 auto ens18
 iface ens18 inet static
@@ -21,116 +18,149 @@ iface ens18 inet static
     gateway 192.168.10.1
     dns-nameservers 127.0.0.1
 EOF
+```
 
+---
+
+## DNS (BIND9)
+
+```bash
 # Install BIND9
 apt update && apt install -y bind9 bind9-utils
 
-# Configure named.conf
+# Enable internal zones include
 echo 'include "/etc/bind/named.conf.internal-zones";' >> /etc/bind/named.conf
 
-# Configure named.conf.options
+# Main DNS options (forwarding + ACL)
 cat > /etc/bind/named.conf.options << 'EOF'
 acl internal-network {
     192.168.10.0/24;
 };
 options {
     directory "/var/cache/bind";
+
+    # Upstream DNS servers
     forwarders {
         1.1.1.1;
         8.8.8.8;
     };
+
+    # Allow queries only from local network
     allow-query { localhost; internal-network; };
+
     allow-transfer { none; };
     recursion yes;
     dnssec-validation no;
+
+    # Disable IPv6
     listen-on-v6 { none; };
 };
 EOF
 
-# Configure internal zones
+# Define zones
 cat > /etc/bind/named.conf.internal-zones << 'EOF'
 zone "gfn.internal" {
     type master;
     file "/etc/bind/db.gfn.internal";
 };
+
 zone "10.168.192.in-addr.arpa" {
     type master;
     file "/etc/bind/db.10.168.192";
 };
 EOF
 
-# Configure forward zone
+# Forward zone records
 cat > /etc/bind/db.gfn.internal << 'EOF'
 $TTL 604800
 @ IN SOA srv1.gfn.internal. admin.gfn.internal. (1 604800 86400 2419200 604800)
 @ IN NS srv1.gfn.internal.
+
+# Hosts
 srv1    IN A 192.168.10.11
 proxmox IN A 192.168.10.10
 router  IN A 192.168.10.1
 CL01    IN A 192.168.10.50
 EOF
 
-# Configure reverse zone
+# Reverse zone records
 cat > /etc/bind/db.10.168.192 << 'EOF'
 $TTL 604800
 @ IN SOA srv1.gfn.internal. admin.gfn.internal. (1 604800 86400 2419200 604800)
 @ IN NS srv1.gfn.internal.
+
+# PTR records
 11 IN PTR srv1.gfn.internal.
 10 IN PTR proxmox.gfn.internal.
 1  IN PTR router.gfn.internal.
 50 IN PTR CL01.gfn.internal.
 EOF
 
-# Disable IPv6 for bind
+# Force IPv4 only
 sed -i 's/^OPTIONS=.*/OPTIONS="-4"/' /etc/default/named
 
-# Restart and enable
+# Restart + enable service
 systemctl restart bind9
 systemctl enable bind9
 
-# Set local DNS
+# Set local resolver
 echo "nameserver 127.0.0.1" > /etc/resolv.conf
 
-# Test DNS
+# Test DNS resolution
 dig proxmox.gfn.internal @192.168.10.11
 ```
-# SRV1 - DHCP Server Configuration
 
-## Complete Setup
+---
 
-\`\`\`bash
-# Install KEA DHCP Server
-apt update && apt install -y kea
+## DHCP (KEA)
 
-# Backup default configuration
+```bash
+# Install KEA DHCP server
+apt install -y kea
+
+# Backup default config
 mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.example
 
-# Configure KEA DHCP
+# Configure DHCP scope
 cat > /etc/kea/kea-dhcp4.conf << 'EOF'
 {
     "Dhcp4": {
+
+        # Interface binding
         "interfaces-config": {
             "interfaces": [ "ens18" ]
         },
+
+        # Control socket
         "control-socket": {
             "socket-type": "unix",
             "socket-name": "/run/kea/kea4-ctrl-socket"
         },
+
+        # Lease database
         "lease-database": {
             "type": "memfile",
             "lfc-interval": 3600
         },
+
+        # Lease timers
         "valid-lifetime": 600,
         "max-valid-lifetime": 7200,
+
+        # Network definition
         "subnet4": [
             {
                 "id": 1,
                 "subnet": "192.168.10.0/24",
+
+                # IP pool
                 "pools": [
                     {
                         "pool": "192.168.10.100 - 192.168.10.200"
                     }
                 ],
+
+                # DHCP options
                 "option-data": [
                     {
                         "name": "routers",
@@ -151,15 +181,21 @@ cat > /etc/kea/kea-dhcp4.conf << 'EOF'
 }
 EOF
 
-# Restart and enable DHCP server
+# Restart + enable DHCP
 systemctl restart kea-dhcp4-server
 systemctl enable kea-dhcp4-server
-systemctl status kea-dhcp4-server --no-pager
-\`\`\`
+```
 
-## Test DHCP Client (on CL01)
-\`\`\`bash
-# On CL01, switch to DHCP
+---
+
+## Client Test
+
+```bash
+# Run on client (CL01)
+
+# Request IP from DHCP
 sudo dhclient -v
+
+# Verify assigned address
 ip addr show
-\`\`\`
+```
