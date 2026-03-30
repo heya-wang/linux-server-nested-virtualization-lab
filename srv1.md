@@ -187,9 +187,6 @@ systemctl enable kea-dhcp4-server
 ```
 
 ---
-# SSH Pubkey Authentication (SRV1 ↔ CL01)
-
----
 
 ## SSH Server (SRV1)
 
@@ -206,34 +203,8 @@ AuthorizedKeysFile .ssh/authorized_keys
 
 # Reload SSH service to apply changes
 sudo systemctl reload sshd
-```
 
----
-
-## SSH Client (CL01)
-
-```bash
-# Generate SSH key pair (RSA 4096)
-ssh-keygen -t rsa -b 4096
-
-# Copy public key to server
-ssh-copy-id -i ~/.ssh/id_rsa.pub student@192.168.10.11
-
-# Test SSH login
-ssh student@192.168.10.11
-```
-
-```bash
-# Keys are stored in:
-~/.ssh/id_rsa      # Private key
-~/.ssh/id_rsa.pub  # Public key
-```
-
----
-
-## Disable Password Authentication (Server Hardening)
-
-```bash
+# Disable Password Authentication (Server Hardening)
 # Edit SSH configuration
 sudo nano /etc/ssh/sshd_config
 
@@ -244,11 +215,52 @@ PasswordAuthentication no
 sudo systemctl reload sshd
 ```
 
-```bash
+---
 
+## LDAP Server (srv1)
+
+```bash
+# Install LDAP
+sudo apt update
+sudo apt install slapd ldap-utils -y
+
+# Configure LDAP
+sudo dpkg-reconfigure slapd
+# DNS domain: gfn.internal
+# Organization: gfn.internal
+# Backend: MDB
+
+# Verify
+sudo systemctl status slapd
+sudo ss -tlnp | grep 389
+
+ldapsearch -x -b "dc=gfn,dc=internal" \
+-D "cn=admin,dc=gfn,dc=internal" -W
+
+# Install LAM (Web UI)
+sudo apt install apache2 php php-ldap php-mbstring php-xml php-json -y
+sudo apt install ldap-account-manager -y
+
+sudo systemctl enable apache2
+sudo systemctl restart apache2
 ```
 
+Web:
+http://192.168.10.11/lam
+
+Login:
+lam / lam
+
+Config:
+
+* Server: ldap://srv1.gfn.internal
+* Base DN: dc=gfn,dc=internal
+
+Users and groups are managed via LAM
+
 ---
+
+
 
 
 
