@@ -1,5 +1,6 @@
 # SRV1 Configuration (Debian 13)
 
+Created as VM on Proxmox:
 > Hostname: srv1<br>
 > IP: 192.168.10.11/24<br>
 > Gateway: 192.168.10.1<br>
