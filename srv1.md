@@ -77,10 +77,12 @@ $TTL 604800
 @ IN NS srv1.gfn.internal.
 
 # Hosts
-srv1    IN A 192.168.10.11
 proxmox IN A 192.168.10.10
 router  IN A 192.168.10.1
 CL01    IN A 192.168.10.50
+srv1    IN A 192.168.10.11
+storage IN A 192.168.10.12
+srv2    IN A 192.168.10.13
 EOF
 
 # Reverse zone records
@@ -90,6 +92,7 @@ $TTL 604800
 @ IN NS srv1.gfn.internal.
 
 # PTR records
+13 IN PTR srv2.gfn.internal
 11 IN PTR srv1.gfn.internal.
 10 IN PTR proxmox.gfn.internal.
 1  IN PTR router.gfn.internal.
