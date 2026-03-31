@@ -19,6 +19,10 @@ iface ens18 inet static
     gateway 192.168.10.1
     dns-nameservers 127.0.0.1
 EOF
+
+# Install sudo and grant privileges to student user
+apt update && apt install -y sudo
+usermod -aG sudo student
 ```
 
 ---
