@@ -17,7 +17,7 @@ Type: IP-SAN (iSCSI)
 
 **Raw:** 3 TB  
 **Usable:** ~2 TB  
-**Disks:** Pool01, Pool02, Pool03  
+**Disks:** Pool01, Pool02, Pool03，configured as RAID-Z (RAID 5 equivalent)  
 
 ## iSCSI
 
@@ -44,3 +44,8 @@ storage IN A 192.168.10.12
 sudo systemctl reload named
 ```
 
+## Proxmox Client
+**Storage ID:** iscsi-storage  
+**Portal IP:** 192.168.10.12  
+**iSCSI Target:** target01 (auto-discovered)  
+**Configuration:** Datacenter → Storage → Add → iSCSI → enter Portal IP → Query Target → select target01  
