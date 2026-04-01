@@ -166,6 +166,6 @@ nextcloud		IN	CNAME		srv2
 Open browser and navigate to http://nextcloud.gfn.internal.
 Create an admin user with username and password.
 Leave data directory as default.
-Scroll to database section and enter name, user, password and host.
+Scroll to database section and enter username, password database name and database host.
 Click "Install".
 Confirm installation of recommended Nextcloud apps.
