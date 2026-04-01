@@ -44,8 +44,7 @@ systemctl reload named
 ```
 ---
 
-## SSH Server (SRV1)
-
+## SSH Server 
 ```bash
 # Install OpenSSH server 
 sudo apt install -y openssh-server
