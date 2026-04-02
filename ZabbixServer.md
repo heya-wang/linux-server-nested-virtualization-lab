@@ -36,9 +36,9 @@ sudo systemctl start mariadb
 
 # Creat database
 sudo mysql -u root -p
- CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;  二进制排序规则（区分大小写）
-CREATE USER zabbix@localhost;
-GRANT ALL PRIVILEGES ON zabbix.* TO zabbix@localhost  IDENTIFIED BY 'password'
+CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;  
+CREATE USER zabbix@localhost; IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON zabbix.* TO zabbix@localhost;
 MariaDB [(none)]> FLUSH PRIVILEGES; 
 MariaDB [(none)]> EXIT; 
 
@@ -49,9 +49,10 @@ DBUser=zabbix
 DBPassword=<password>
 EOF
 
-#Import database
+# Import database
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 systemctl restart apache2
+# Input password
 
 ```
 ---
@@ -66,7 +67,7 @@ systemctl status zabbix-agent
 
 
 ## Access Web Interface
-On cl01 open http://192.168.10.11/zabbix and complete the setup wizard:
+On cl01 open http://192.168.10.15/zabbix and complete the setup wizard:
 
 Database: zabbix / zabbix / <password>
 
